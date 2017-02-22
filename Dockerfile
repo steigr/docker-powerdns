@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:edge
 MAINTAINER \
 [Christoph Wiechert <wio@psitrax.de>] \
 [Mathias Kaufmann <me@stei.gr>]
@@ -6,9 +6,9 @@ MAINTAINER \
 ENV REFRESHED_AT="2017-02-22" \
     POWERDNS_VERSION=4.0.3
 
-RUN apk --update add mysql-client mariadb-client-libs libpq sqlite-libs libstdc++ libgcc postgresql-client sqlite \
+RUN apk --update add mysql-client mariadb-client-libs libpq sqlite-libs libstdc++ libgcc postgresql-client libgss p11-kit luajit krb5-libs sqlite \
  && apk add --virtual build-deps \
-      g++ make mariadb-dev postgresql-dev sqlite-dev curl boost-dev file binutils  \
+      g++ make mariadb-dev postgresql-dev sqlite-dev curl boost-dev file binutils libgss-dev p11-kit-dev luajit-dev  krb5-dev \
  && curl -sSL https://downloads.powerdns.com/releases/pdns-$POWERDNS_VERSION.tar.bz2 | tar xj -C /tmp \
  && cd /tmp/pdns-$POWERDNS_VERSION \
  && ./configure \
@@ -17,7 +17,11 @@ RUN apk --update add mysql-client mariadb-client-libs libpq sqlite-libs libstdc+
       --sysconfdir=/etc/pdns \
       --with-modules="" \
       --with-dynmodules="bind gmysql gpgsql gsqlite3 random" \
-      --without-lua \
+      --with-luajit \
+      --enable-experimental-gss-tsig \
+      --enable-experimental-pkcs11 \
+      CFLAGS="-Ofast" \
+      CXXFLAGS="-Ofast" \
  && make \
  && make install-strip \
  && cd / \
