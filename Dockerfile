@@ -1,8 +1,14 @@
 FROM alpine
 MAINTAINER Christoph Wiechert <wio@psitrax.de>
 
-ENV REFRESHED_AT="2017-01-17" \
-    POWERDNS_VERSION=4.0.2
+ENV REFRESHED_AT="2017-05-17" \
+    POWERDNS_VERSION=4.0.3 \
+    MYSQL_AUTOCONF=true \
+    MYSQL_HOST="mysql" \
+    MYSQL_PORT="3306" \
+    MYSQL_USER="root" \
+    MYSQL_PASS="root" \
+    MYSQL_DB="pdns"
 
 RUN apk --update add mysql-client mariadb-client-libs libpq sqlite-libs libstdc++ libgcc && \
     apk add --virtual build-deps \
@@ -18,26 +24,9 @@ RUN apk --update add mysql-client mariadb-client-libs libpq sqlite-libs libstdc+
     apk del --purge build-deps && \
     rm -rf /tmp/pdns-$POWERDNS_VERSION /var/cache/apk/*
 
+ADD schema.sql pdns.conf /etc/pdns/
+ADD entrypoint.sh /
 
 EXPOSE 53/tcp 53/udp
 
-ADD mysql.schema.sql pgsql.schema.sql sqlite3.schema.sql pdns.conf /etc/pdns/
-
-ADD tini /bin/tini
-ENTRYPOINT ["tini","powerdns"]
-ADD entrypoint.sh /bin/powerdns
-
-EXPOSE 53/tcp 53/udp
-
-ENV AUTOCONF=mysql \
-    MYSQL_HOST="mysql" \
-    MYSQL_PORT="3306" \
-    MYSQL_USER="root" \
-    MYSQL_PASS="root" \
-    MYSQL_DB="pdns" \
-    PGSQL_HOST="postgres" \
-    PGSQL_PORT="5432" \
-    PGSQL_USER="postgres" \
-    PGSQL_PASS="postgres" \
-    PGSQL_DB="pdns" \
-    SQLITE_DB="pdns.sqlite3"
+ENTRYPOINT ["/entrypoint.sh"]
