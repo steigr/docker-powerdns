@@ -42,7 +42,7 @@ if $MYSQL_AUTOCONF ; then
 
   if [ "$(echo "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = \"$MYSQL_DB\";" | $MYSQLCMD)" -le 1 ]; then
     echo Initializing Database
-    cat /etc/pdns/schema.sql | $MYSQLCMD
+    cat /etc/pdns/mysql.schema.sql | $MYSQLCMD
   fi
 
   unset -v MYSQL_PASS

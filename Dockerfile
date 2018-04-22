@@ -24,7 +24,12 @@ RUN apk --update add mysql-client mariadb-client-libs libpq sqlite-libs libstdc+
     apk del --purge build-deps && \
     rm -rf /tmp/pdns-$POWERDNS_VERSION /var/cache/apk/*
 
-ADD schema.sql pdns.conf /etc/pdns/
+ADD pdns.conf /etc/pdns/
+
+ADD mysql.schema.sql   /etc/pdns/
+ADD pgsql.schema.sql   /etc/pdns/
+ADD sqlite3.schema.sql /etc/pdns/
+
 ADD entrypoint.sh /
 
 EXPOSE 53/tcp 53/udp
