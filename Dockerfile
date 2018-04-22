@@ -30,6 +30,7 @@ ADD mysql.schema.sql   /etc/pdns/
 ADD pgsql.schema.sql   /etc/pdns/
 ADD sqlite3.schema.sql /etc/pdns/
 
+ADD /backend /etc/pdns/backend
 ADD entrypoint.sh /
 
 EXPOSE 53/tcp 53/udp
